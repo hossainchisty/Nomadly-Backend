@@ -7,9 +7,16 @@ from properties.models.property_models import Property, PropertyFeature
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = ProjectImage
         fields = "__all__"
+
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
 
 
 class PropertyFeatureSerializer(serializers.ModelSerializer):
@@ -24,6 +31,12 @@ class PropertyTagSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class AmenitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Amenity
+        fields = "__all__"
+
+
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
@@ -34,12 +47,10 @@ class PropertySerializer(serializers.ModelSerializer):
     tag = PropertyTagSerializer()
     country = LocationSerializer()
     city = LocationSerializer()
-    district = LocationSerializer()
     neighborhood = LocationSerializer()
     property_features = PropertyFeatureSerializer(many=True)
-    architecture_images = PropertyImageSerializer(many=True)
+    amenities = AmenitySerializer(many=True)
     interior_images = PropertyImageSerializer(many=True)
-    exterior_images = PropertyImageSerializer(many=True)
 
     class Meta:
         model = Property
