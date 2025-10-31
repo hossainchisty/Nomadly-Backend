@@ -67,12 +67,10 @@ class PropertyRetrieveSerializer(serializers.ModelSerializer):
     tag = PropertyTagSerializer()
     country = LocationSerializer()
     city = LocationSerializer()
-    district = LocationSerializer()
     neighborhood = LocationSerializer()
     property_features = PropertyFeatureSerializer(many=True)
-    architecture_images = PropertyImageSerializer(many=True)
     interior_images = PropertyImageSerializer(many=True)
-    exterior_images = PropertyImageSerializer(many=True)
+    
 
     class Meta:
         model = Property
