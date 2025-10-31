@@ -92,6 +92,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "profile_completion_percentage",
             "is_profile_complete",
             "role",
+            "is_active",
+            "is_verified",
             "date_joined",
             "last_login",
         )
