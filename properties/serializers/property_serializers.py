@@ -4,6 +4,7 @@ from properties.models.basic_info import Amenity, PropertyTag
 from properties.models.location_model import Location
 from properties.models.project_image_models import ProjectImage
 from properties.models.property_models import Property, PropertyFeature
+from users.serializers import UserProfileSerializer
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -70,6 +71,7 @@ class PropertyRetrieveSerializer(serializers.ModelSerializer):
     neighborhood = LocationSerializer()
     property_features = PropertyFeatureSerializer(many=True)
     interior_images = PropertyImageSerializer(many=True)
+    listed_by = UserProfileSerializer()
     
 
     class Meta:
