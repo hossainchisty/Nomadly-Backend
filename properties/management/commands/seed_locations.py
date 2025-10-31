@@ -22,7 +22,6 @@ class Command(BaseCommand):
             country_obj, _ = Location.objects.get_or_create(
                 name=country_name,
                 location_type=Location.LocationType.COUNTRY,
-                parent_location=None,
             )
 
             # Create cities
@@ -30,7 +29,6 @@ class Command(BaseCommand):
                 city_obj, _ = Location.objects.get_or_create(
                     name=city_name,
                     location_type=Location.LocationType.CITY,
-                    parent_location=country_obj,
                 )
                 created_count += 1
 
