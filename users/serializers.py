@@ -77,6 +77,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         source="profile.is_profile_complete"
     )
     full_name = serializers.ReadOnlyField(source="get_full_name")
+    profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -100,6 +101,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "profile_completion_percentage",
             "is_profile_complete",
         )
+
+    def get_profile_picture(self, obj):
+        if obj.profile_picture:
+            return obj.profile_picture.url
+        return None
 
 
 class ProfileSerializer(serializers.ModelSerializer):
