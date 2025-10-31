@@ -1,15 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from properties.models.basic_info import Amenity, PropertyTag
-from properties.models.location_model import Location
 from properties.models.property_feature import PropertyFeature
 from properties.models.property_models import Property
 from properties.serializers.dropdown_serializers import (
     AmenityDropdownSerializer,
-    LocationDropdownSerializer,
     PropertyFeatureDropdownSerializer,
     PropertyTagDropdownSerializer,
 )
@@ -37,7 +35,12 @@ class PropertyViewSet(viewsets.ModelViewSet):
     serializer_class = PropertySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = [
-        "name",
+        "property_name",
+        "address",
+        "city__name",
+        "country__name",
+        "neighborhood__name",
+        "tag__name",
     ]
 
     serializer_action_map = {
@@ -50,11 +53,21 @@ class PropertyViewSet(viewsets.ModelViewSet):
     }
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset
+        return super().get_queryset()
 
     def get_serializer_class(self):
         return self.serializer_action_map.get(self.action, self.serializer_class)
+
+    def get_permissions(self):
+        """
+        Allow unauthenticated access for 'list' only.
+        Require authentication for all other actions.
+        """
+        if self.action == "list":
+            return [permissions.AllowAny()]
+        if self.action in ["retrieve"]:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
 
 
 class AmenityViewSet(viewsets.ModelViewSet):
