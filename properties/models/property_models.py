@@ -79,4 +79,4 @@ class Property(BaseModel, PropertyBasicInformation):
         ]
 
     def __str__(self):
-        return f"{self.name} - {self.city}, {self.country}"
+        return f"{self.property_name} - {self.city}, {self.country}"
