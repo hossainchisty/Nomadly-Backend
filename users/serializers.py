@@ -90,6 +90,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "profile_picture",
             "profile_completion_percentage",
             "is_profile_complete",
+            "role",
+            "date_joined",
+            "last_login",
         )
         read_only_fields = (
             "id",
@@ -333,7 +336,7 @@ class UserGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "name", "phone_number", "email", "groups", "permissions"]
+        fields = ["id", "username", "phone_number", "email", "groups", "permissions"]
 
     def get_groups(self, obj):
         return [group.name for group in obj.groups.all()]

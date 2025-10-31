@@ -1,17 +1,16 @@
-from django.utils import timezone
-from rest_framework import filters
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
-from rest_framework.permissions import AllowAny
-from rest_framework import permissions, status, viewsets
 from django.contrib.auth import authenticate, get_user_model
-from rest_framework_simplejwt.views import TokenObtainPairView
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Group, Permission
-from rest_framework.permissions import IsAdminUser
+from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework import filters, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 from users.serializers import (
     GroupDropDownSerializer,
     GroupSerializer,
@@ -157,14 +156,14 @@ class RegisterView(APIView):
 
 class UserModelViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         queryset = User.objects.all()
         role = self.request.query_params.get("role")
         if role:
             queryset = queryset.filter(role=role)
-            return queryset
-        return super().get_queryset()
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -180,15 +179,18 @@ class UserModelViewset(viewsets.ModelViewSet):
         return UserListSerializer
 
     def get_permissions(self):
-        if self.action == "list":
-            permission_classes = [permissions.IsAuthenticated]
-        elif self.action in ["update", "partial_update"]:
+        if self.action in ["list", "update", "partial_update", "me"]:
             permission_classes = [permissions.IsAuthenticated]
         elif self.action in ["create", "destroy"]:
             permission_classes = [permissions.IsAdminUser]
         else:
-            permission_classes = [permissions.AllowAny]
+            permission_classes = [permissions.IsAdminUser]
         return [p() for p in permission_classes]
+
+    @action(detail=False, methods=["get"], url_path="me")
+    def me(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
 
 
 class PermissionViewSet(ModelViewSet):
