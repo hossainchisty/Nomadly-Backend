@@ -4,6 +4,7 @@ from properties.models.basic_info import Amenity, PropertyTag
 from properties.models.location_model import Location
 from properties.models.project_image_models import ProjectImage
 from properties.models.property_models import Property, PropertyFeature
+from properties.models.property_review import PropertyReview
 from users.serializers import UserProfileSerializer
 
 
@@ -64,6 +65,14 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class PropertyReviewSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer()
+
+    class Meta:
+        model = PropertyReview
+        fields = ["user", "rating", "comment", "created_at"]
+
+
 class PropertyRetrieveSerializer(serializers.ModelSerializer):
     tag = PropertyTagSerializer()
     country = LocationSerializer()
@@ -72,11 +81,15 @@ class PropertyRetrieveSerializer(serializers.ModelSerializer):
     property_features = PropertyFeatureSerializer(many=True)
     interior_images = PropertyImageSerializer(many=True)
     listed_by = UserProfileSerializer()
-    
+    review = serializers.SerializerMethodField()
 
     class Meta:
         model = Property
         fields = "__all__"
+
+    def get_review(self, obj):
+        reviews = PropertyReview.objects.filter(property=obj)
+        return PropertyReviewSerializer(reviews, many=True).data
 
 
 class PropertyUpdateSerializer(serializers.ModelSerializer):
