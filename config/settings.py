@@ -36,13 +36,13 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
 
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGIN_REGEXES = [r".*"]
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "X-CSRFToken",
 ]
+CORS_ALLOW_METHODS = list(default_methods)
 
 
 ## Default apps installed
@@ -58,8 +58,8 @@ INSTALLED_APPS = [
 ## Third Party apps installed
 INSTALLED_APPS += [
     "rest_framework",
-    "drf_yasg",
     "drf_spectacular",
+    "drf_spectacular_sidecar",
     "corsheaders",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
