@@ -32,15 +32,15 @@ from users.serializers import (
 User = get_user_model()
 
 
-class CustomTokenObtainPairView(TokenObtainPairView):
+class LoginView(TokenObtainPairView):
     """
-    Custom JWT login view using username field,
+    Login view using username field,
     where username contains either email or phone number.
     """
 
     @extend_schema(
-        summary="Obtain Token Pair",
-        description="Takes a set of user credentials and returns an access and refresh JSON web token pair.",
+        summary="Login",
+        description="Takes a username and password and returns an access and refresh JSON web token pair.",
         responses={
             200: OpenApiTypes.OBJECT,
             401: OpenApiTypes.OBJECT,
@@ -84,6 +84,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 class RegisterView(APIView):
+    """ Register a new user with email/phone and password. """
     permission_classes = [AllowAny]
 
     @extend_schema(

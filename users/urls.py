@@ -13,7 +13,7 @@ routers.register(r"system-access", UserGroupViewSet, basename="user-groups")
 
 urlpatterns = [
     path("register/", views.RegisterView.as_view(), name="register"),
-    path("login/", views.CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("login/", views.LoginView.as_view(), name="login"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 urlpatterns += routers.urls
