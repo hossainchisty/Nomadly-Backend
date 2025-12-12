@@ -3,6 +3,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -37,6 +38,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     where username contains either email or phone number.
     """
 
+    @extend_schema(
+        summary="Obtain Token Pair",
+        description="Takes a set of user credentials and returns an access and refresh JSON web token pair.",
+        responses={
+            200: OpenApiTypes.OBJECT,
+            401: OpenApiTypes.OBJECT,
+        },
+    )
     def post(self, request, *args, **kwargs):
         username = request.data.get(
             "username"
@@ -77,6 +86,12 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        summary="Register User",
+        description="Register a new user with email/phone and password.",
+        request=UserRegistrationSerializer,
+        responses={201: OpenApiTypes.OBJECT},
+    )
     def post(self, request):
         """Handle registration"""
         serializer = UserRegistrationSerializer(data=request.data)
@@ -187,6 +202,26 @@ class UserModelViewset(viewsets.ModelViewSet):
             permission_classes = [permissions.IsAdminUser]
         return [p() for p in permission_classes]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="role",
+                description="Filter users by role",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="dropdown",
+                description="Return dropdown format if true",
+                required=False,
+                type=OpenApiTypes.BOOL,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(summary="Get Current User Profile", responses=UserProfileSerializer)
     @action(detail=False, methods=["get"], url_path="me")
     def me(self, request):
         serializer = UserProfileSerializer(request.user)
@@ -216,6 +251,11 @@ class PermissionViewSet(ModelViewSet):
         return super().get_serializer_class()
 
     # Assign group/role to user
+    @extend_schema(
+        summary="Set Users Role",
+        description="Assign a role to a user",
+        request=SetUserRoleSerializer,
+    )
     @action(detail=False, methods=["POST"], url_path="set-user")
     def set_users_role(self, request):
         serializer = SetUserRoleSerializer(data=request.data)
@@ -224,6 +264,11 @@ class PermissionViewSet(ModelViewSet):
         return Response({"message": "Roles assigned successfully"})
 
     # Assign individual permissions to user
+    @extend_schema(
+        summary="Set User Permissions",
+        description="Assign specific permissions to a user",
+        request=SetUserPermissionsSerializer,
+    )
     @action(detail=False, methods=["POST"], url_path="set-user-permissions")
     def set_user_permissions(self, request):
         serializer = SetUserPermissionsSerializer(data=request.data)
@@ -232,6 +277,10 @@ class PermissionViewSet(ModelViewSet):
         return Response({"message": "Permissions assigned successfully"})
 
     # Get all permissions grouped by app and model
+    @extend_schema(
+        summary="Permission List",
+        description="Get all permissions grouped by app and model",
+    )
     @action(detail=False, methods=["GET"], url_path="permission-list")
     def permission_list(self, request):
         permissions = Permission.objects.all().select_related("content_type")
@@ -252,6 +301,18 @@ class PermissionViewSet(ModelViewSet):
         return Response(formatted)
 
     # Get user permissions
+    @extend_schema(
+        summary="User Permissions",
+        description="Get all permissions for a specific user",
+        parameters=[
+            OpenApiParameter(
+                name="user_id",
+                description="ID of the user to fetch permissions for",
+                required=True,
+                type=OpenApiTypes.INT,
+            )
+        ],
+    )
     @action(detail=False, methods=["GET"], url_path="user-permissions")
     def user_permissions(self, request):
         user_id = request.query_params.get("user_id")
@@ -270,6 +331,11 @@ class PermissionViewSet(ModelViewSet):
         )
 
     # Create a custom permission
+    @extend_schema(
+        summary="Add Custom Permission",
+        description="Create a new custom permission",
+        request=OpenApiTypes.OBJECT,
+    )
     @action(detail=False, methods=["POST"], url_path="add-custom")
     def add_custom_permission(self, request):
         name = request.data.get("name")
@@ -333,6 +399,19 @@ class GroupViewSet(ModelViewSet):
             return GroupDropDownSerializer
         return super().get_serializer_class()
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="dropdown",
+                description="Return dropdown format if true",
+                required=False,
+                type=OpenApiTypes.BOOL,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class UserGroupViewSet(ModelViewSet):
     """Group and permission to access a user into system"""
@@ -341,6 +420,7 @@ class UserGroupViewSet(ModelViewSet):
     serializer_class = UserGroupSerializer
     permission_classes = [IsAdminUser]
 
+    @extend_schema(summary="Get Current User Group Info")
     @action(detail=False, methods=["get"], url_path="me")
     def me(self, request):
         user = request.user

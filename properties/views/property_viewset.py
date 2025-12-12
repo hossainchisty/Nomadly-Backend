@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -108,6 +109,19 @@ class PropertyFeatureViewSet(viewsets.ModelViewSet):
         "delete": PropertyFeatureDeleteSerializer,
     }
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="category",
+                description="Filter by category",
+                required=False,
+                type=OpenApiTypes.STR,
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
         queryset = super().get_queryset()
         category = self.request.query_params.get("category")
@@ -122,6 +136,10 @@ class PropertyFeatureViewSet(viewsets.ModelViewSet):
 class PropertyDropdownViewSet(viewsets.ViewSet):
     """ViewSet to return dropdown lists for property-related models."""
 
+    @extend_schema(
+        summary="Get Property Features Dropdown",
+        responses=PropertyFeatureDropdownSerializer(many=True),
+    )
     @action(detail=False, methods=["get"])
     def features(self, request):
         """
@@ -132,6 +150,10 @@ class PropertyDropdownViewSet(viewsets.ViewSet):
         serializer = PropertyFeatureDropdownSerializer(features, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        summary="Get Amenities Dropdown",
+        responses=AmenityDropdownSerializer(many=True),
+    )
     @action(detail=False, methods=["get"])
     def aminities(self, request):
         """
@@ -142,6 +164,10 @@ class PropertyDropdownViewSet(viewsets.ViewSet):
         serializer = AmenityDropdownSerializer(features, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        summary="Get Property Tags Dropdown",
+        responses=PropertyTagDropdownSerializer(many=True),
+    )
     @action(detail=False, methods=["get"])
     def tags(self, request):
         """

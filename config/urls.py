@@ -8,19 +8,9 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from rest_framework import permissions
-
 from config.health import HealthCheckView
 
-schema_view = SpectacularAPIView(
-    title="Snippets API",
-    default_version="v1",
-    description="Test description",
-    terms_of_service="https://www.google.com/policies/terms/",
-    contact=openapi.Contact(email="hossain.chisty11@gmail.com"),
-    license=openapi.License(name="Apache-2.0 license"),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+
 
 
 urlpatterns = [

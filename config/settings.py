@@ -2,7 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 from urllib.parse import parse_qsl, urlparse
-
+from corsheaders.defaults import default_headers, default_methods
 import environ
 
 # Initialise environment variables
@@ -188,6 +188,7 @@ REST_FRAMEWORK = {
     ],
     ## Throttle Rate
     "DEFAULT_THROTTLE_RATES": {"anon": "10/second", "user": "30/second"},
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 ## JWT configuration
@@ -227,3 +228,23 @@ SIMPLE_JWT = {
 
 
 AUTH_USER_MODEL = "users.User"
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Nomadly API",
+    "DESCRIPTION": "Nomadly API Documentation",
+    # Version will show as "1.0.0 (v1)" - combining base version with URL path version
+    "VERSION": "1.0.0",
+    # Extract version from URL path like /api/v1/ or /api/v2/
+    "SCHEMA_PATH_PREFIX": "/api/v[0-9]",
+    # Additional API metadata
+    "TOS": "https://www.nomadly.com/terms/",
+    "CONTACT": {
+        "name": "Nomadly API Support",
+        "email": "api@nomadly.com",
+    },
+    "LICENSE": {
+        "name": "Nomadly License",
+        "url": "https://www.nomadly.com/license/",
+    },
+}

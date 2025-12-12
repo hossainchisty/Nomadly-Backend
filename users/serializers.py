@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.password_validation import validate_password
+from drf_spectacular.utils import OpenApiTypes, extend_schema_field
 from rest_framework import serializers
 
 from .models import Profile
@@ -70,12 +71,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    profile_completion_percentage = serializers.ReadOnlyField(
-        source="profile.profile_completion_percentage"
-    )
-    is_profile_complete = serializers.ReadOnlyField(
-        source="profile.is_profile_complete"
-    )
+    profile_completion_percentage = serializers.SerializerMethodField()
+    is_profile_complete = serializers.SerializerMethodField()
     full_name = serializers.ReadOnlyField(source="get_full_name")
     profile_picture = serializers.SerializerMethodField()
 
@@ -108,6 +105,29 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if obj.profile_picture:
             return obj.profile_picture.url
         return None
+
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_profile_completion_percentage(self, obj):
+        if not hasattr(obj, "profile"):
+            return 0
+        # Calculate purely based on fields, duplicating logic from model to ensure safety
+        fields_to_check = [
+            obj.first_name,
+            obj.last_name,
+            obj.email,
+            obj.profile_picture,
+            obj.profile.linkedin,
+            obj.profile.website,
+        ]
+        completed_fields = sum(1 for field in fields_to_check if field)
+        total_fields = len(fields_to_check)
+        if total_fields == 0:
+            return 0
+        return int((completed_fields / total_fields) * 100)
+
+    @extend_schema_field(OpenApiTypes.BOOL)
+    def get_is_profile_complete(self, obj):
+        return self.get_profile_completion_percentage(obj) == 100
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -346,9 +366,11 @@ class UserGroupSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "username", "phone_number", "email", "groups", "permissions"]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_groups(self, obj):
         return [group.name for group in obj.groups.all()]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_permissions(self, obj):
         permissions = set()
         for group in obj.groups.all():
