@@ -10,6 +10,7 @@ User = get_user_model()
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    """ User registration serializer """
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password]
     )
@@ -71,6 +72,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    """ User profile serializer """
     profile_completion_percentage = serializers.SerializerMethodField()
     is_profile_complete = serializers.SerializerMethodField()
     full_name = serializers.ReadOnlyField(source="get_full_name")
@@ -102,12 +104,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
 
     def get_profile_picture(self, obj):
+        """ Get profile picture URL """
         if obj.profile_picture:
             return obj.profile_picture.url
         return None
 
     @extend_schema_field(OpenApiTypes.INT)
     def get_profile_completion_percentage(self, obj):
+        """ Get profile completion percentage """
         if not hasattr(obj, "profile"):
             return 0
         # Calculate purely based on fields, duplicating logic from model to ensure safety
@@ -127,16 +131,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_profile_complete(self, obj):
+        """ Get is profile complete """
         return self.get_profile_completion_percentage(obj) == 100
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    """ Profile serializer """
     class Meta:
         model = Profile
         exclude = ["user", "created_at", "updated_at"]
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
+    """ User create serializer """
     profile = ProfileSerializer(required=False)
     password = serializers.CharField(write_only=True)
 
@@ -232,11 +239,6 @@ class UserDropDownSerializer(serializers.ModelSerializer):
         model = User
         fields = ["label", "value"]
 
-
-class UserDeleteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id"]
 
 
 class PermissionSerializer(serializers.ModelSerializer):

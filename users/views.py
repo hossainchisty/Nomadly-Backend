@@ -20,7 +20,6 @@ from users.serializers import (
     SetUserPermissionsSerializer,
     SetUserRoleSerializer,
     UserCreateSerializer,
-    UserDeleteSerializer,
     UserDropDownSerializer,
     UserGroupSerializer,
     UserListSerializer,
@@ -190,14 +189,12 @@ class UserModelViewset(viewsets.ModelViewSet):
             return UserCreateSerializer
         elif self.action in ["update", "partial_update"]:
             return UserUpdateSerializer
-        elif self.action == "destroy":
-            return UserDeleteSerializer
         return UserListSerializer
 
     def get_permissions(self):
         if self.action in ["list", "update", "partial_update", "me"]:
             permission_classes = [permissions.IsAuthenticated]
-        elif self.action in ["create", "destroy"]:
+        elif self.action in ["create"]:
             permission_classes = [permissions.IsAdminUser]
         else:
             permission_classes = [permissions.IsAdminUser]
