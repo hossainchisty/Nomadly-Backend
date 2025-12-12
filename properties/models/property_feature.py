@@ -3,7 +3,7 @@ from django.db import models
 
 
 class PropertyFeature(models.Model):
-    """Model to represent various features of a property."""
+    """ Property feature model """
 
     name = models.CharField(max_length=100, unique=True)
     category = models.CharField(max_length=100, null=True, blank=True, choices=[

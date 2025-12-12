@@ -4,6 +4,7 @@ from base.models import BaseModel
 
 
 class Location(BaseModel):
+    """ Location model for properties """
     class LocationType(models.TextChoices):
         COUNTRY = "country", _("Country")
         CITY = "city", _("City")

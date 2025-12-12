@@ -9,6 +9,7 @@ from users.models import User
 
 
 class Property(BaseModel, PropertyBasicInformation):
+    """ Property model """  
     class PropertyTypeChoices(models.TextChoices):
         APARTMENT = "apartment", _("Apartment")
         VILLA = "villa", _("Villa")

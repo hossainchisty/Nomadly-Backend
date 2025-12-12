@@ -7,10 +7,12 @@ from properties.models.location_model import Location
 
 
 class PropertyTag(models.Model):
+    """ Property tags for filtering properties """
     name = models.CharField(max_length=200, unique=True)
 
 
 class Amenity(models.Model):
+    """ Amenity model for properties features """
     name = models.CharField(max_length=200, unique=True)
     icon = models.CharField(max_length=200, unique=True)
 
@@ -19,6 +21,7 @@ class Amenity(models.Model):
 
 
 class PropertyBasicInformation(DeepDeleteMixin, models.Model):
+    """ Property basic information model """
     class UnitTypeChoices(models.TextChoices):
         APARTMENT = "apartment", _("Apartment")
         VILLA = "villa", _("Villa")

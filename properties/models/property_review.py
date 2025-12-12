@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class PropertyReview(models.Model):
+    """ Property review model """
     property = models.ForeignKey(
         "properties.Property",
         on_delete=models.CASCADE,

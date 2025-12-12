@@ -6,6 +6,7 @@ from properties.models.property_feature import PropertyFeature
 
 
 class PropertyFeatureDropdownSerializer(serializers.ModelSerializer):
+    """ Property feature dropdown serializer """
     label = serializers.CharField(source="name")
     value = serializers.CharField(source="id")
 
@@ -14,6 +15,7 @@ class PropertyFeatureDropdownSerializer(serializers.ModelSerializer):
         fields = ["label", "value"]
         
 class AmenityDropdownSerializer(serializers.ModelSerializer):
+    """ Amenity dropdown serializer """
     label = serializers.CharField(source="name")
     value = serializers.CharField(source="id")
 
@@ -23,6 +25,7 @@ class AmenityDropdownSerializer(serializers.ModelSerializer):
 
 
 class PropertyTagDropdownSerializer(serializers.ModelSerializer):
+    """ Property tag dropdown serializer """
     label = serializers.CharField(source="name")
     value = serializers.CharField(source="id")
 
@@ -32,6 +35,7 @@ class PropertyTagDropdownSerializer(serializers.ModelSerializer):
 
 
 class LocationDropdownSerializer(serializers.ModelSerializer):
+    """ Location dropdown serializer """
     label = serializers.CharField(source="name")
     value = serializers.CharField(source="id")
 
